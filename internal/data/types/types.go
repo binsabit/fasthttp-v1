@@ -1,3 +1,3 @@
-package data
+package types
 
 type StorageInterface interface{}
