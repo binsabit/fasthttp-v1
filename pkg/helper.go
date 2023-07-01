@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
 )
 
 type MalformedRequest struct {
@@ -24,7 +24,7 @@ func (mr *MalformedRequest) Error() string {
 func DecodeJSONBody(c *fiber.Ctx, dst interface{}) error {
 	if c.Get("Content-Type") != "application/json" {
 		msg := "Content-Type header is not application/json"
-		return &MalformedRequest{Status: http.StatusUnsupportedMediaType, Msg: msg}
+		return &MalformedRequest{Status: fasthttp.StatusUnsupportedMediaType, Msg: msg}
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(c.Body()))
@@ -41,11 +41,11 @@ func DecodeJSONBody(c *fiber.Ctx, dst interface{}) error {
 				"Request body contains badly-formed JSON (at position %d)",
 				syntaxError.Offset,
 			)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return &MalformedRequest{Status: fasthttp.StatusBadRequest, Msg: msg}
 
 		case errors.Is(err, io.ErrUnexpectedEOF):
 			return &MalformedRequest{
-				Status: http.StatusBadRequest,
+				Status: fasthttp.StatusBadRequest,
 				Msg:    "Request body contains badly-formed JSON",
 			}
 
@@ -55,16 +55,16 @@ func DecodeJSONBody(c *fiber.Ctx, dst interface{}) error {
 				unmarshalTypeError.Field,
 				unmarshalTypeError.Offset,
 			)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return &MalformedRequest{Status: fasthttp.StatusBadRequest, Msg: msg}
 
 		case strings.HasPrefix(err.Error(), "json: unknown field "):
 			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field ")
 			msg := fmt.Sprintf("Request body contains unknown field %s", fieldName)
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return &MalformedRequest{Status: fasthttp.StatusBadRequest, Msg: msg}
 
 		case errors.Is(err, io.EOF):
 			msg := "Request body must not be empty"
-			return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+			return &MalformedRequest{Status: fasthttp.StatusBadRequest, Msg: msg}
 
 		// case err.Error() == "http: request body too large":
 		// 	msg := "Request body must not be larger than 1MB"
@@ -78,7 +78,7 @@ func DecodeJSONBody(c *fiber.Ctx, dst interface{}) error {
 	err = dec.Decode(&struct{}{})
 	if err != io.EOF {
 		msg := "Request body must only contain a single JSON object"
-		return &MalformedRequest{Status: http.StatusBadRequest, Msg: msg}
+		return &MalformedRequest{Status: fasthttp.StatusBadRequest, Msg: msg}
 	}
 
 	return nil
