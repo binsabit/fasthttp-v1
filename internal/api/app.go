@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -31,23 +30,22 @@ func NewAplication(serverPort string, infolog, errorlog *log.Logger) *Applicatio
 	}
 }
 
-func Run(ctx context.Context) error {
+func Run() {
 	config := config.Configure()
 
 	infoLog := pkg.NewLogger(config.LogFile, "INFO")
 	errorLog := pkg.NewLogger(config.LogFile, "ERROR")
 
-	pool, err := postgesql.NewPGXPool(context.Background(), config.DB_DSN)
+	pool, err := postgesql.NewPGXPool(context.Background(), config.DB)
 	if err != nil {
-		return fmt.Errorf("could not establish db connetion pool: %v", err)
+		errorLog.Fatalf("could not establish db connetion pool: %v", err)
 	}
 	defer pool.Close()
-
-	app := NewAplication(config.ServerPort, infoLog, errorLog)
+	app := NewAplication(config.Port, infoLog, errorLog)
 
 	app.router.Use(cors.New())
 	app.setupRoutes()
 
-	return app.router.Listen(":" + app.serverPort)
+	app.router.Listen(":" + app.serverPort)
 
 }

@@ -12,7 +12,7 @@ import (
 func TestConnectoin(t *testing.T) {
 	config := config.Configure()
 	// dsn := "postgres://yerdaulet:pa55word@localhost:5432/prosclad"
-	pool, err := postgesql.NewPGXPool(context.Background(), config.DB_DSN)
+	pool, err := postgesql.NewPGXPool(context.Background(), config.DB)
 	assert.Nil(t, err)
 
 	err = pool.Ping(context.Background())
