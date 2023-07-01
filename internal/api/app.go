@@ -31,17 +31,17 @@ func NewAplication(serverPort string, infolog, errorlog *log.Logger) *Applicatio
 }
 
 func Run() {
-	config := config.Configure()
+	cfg := config.Configure()
 
-	infoLog := pkg.NewLogger(config.LogFile, "INFO")
-	errorLog := pkg.NewLogger(config.LogFile, "ERROR")
+	infoLog := pkg.NewLogger(cfg.LogFile, "INFO")
+	errorLog := pkg.NewLogger(cfg.LogFile, "ERROR")
 
-	pool, err := postgesql.NewPGXPool(context.Background(), config.DB)
+	pool, err := postgesql.NewPGXPool(context.Background(), cfg.DB)
 	if err != nil {
 		errorLog.Fatalf("could not establish db connetion pool: %v", err)
 	}
 	defer pool.Close()
-	app := NewAplication(config.Port, infoLog, errorLog)
+	app := NewAplication(cfg.Port, infoLog, errorLog)
 
 	app.router.Use(cors.New())
 	app.setupRoutes()

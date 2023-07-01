@@ -40,7 +40,6 @@ func Configure() Config {
 	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatalf("could not unmarshal config:%v", err)
 	}
-
 	return config
 
 }
