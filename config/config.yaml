@@ -1,0 +1,3 @@
+port: "8080"
+db: postgres://yerdaulet:pa55word@localhost:5432/prosclad"
+logfile: "./log/log.txt"

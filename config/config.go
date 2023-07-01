@@ -2,36 +2,45 @@ package config
 
 import (
 	"log"
-	"os"
-	"path/filepath"
 
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	ServerPort string
-	DB_DSN     string
-	LogFile    string
+	Port    string
+	DB      string
+	LogFile string
 }
+
+var (
+	defaults = map[string]interface{}{
+		"port":    "8080",
+		"db":      "postgres://yerdaulet:pa55word@localhost:5432/prosclad",
+		"logfile": "../log/log.txt",
+	}
+	configPath = []string{"./config"}
+)
 
 func Configure() Config {
-	return Config{
-		ServerPort: getEnv("SERVER_PORT", "8080"),
-		DB_DSN:     getEnv("DB_DSN", "postgres://yerdaulet:pa55word@localhost:5432/prosclad"),
-		LogFile:    getEnv("LOG_FILE", "./log/log.txt"),
+	for k, v := range defaults {
+		viper.SetDefault(k, v)
 	}
-}
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
 
-func getEnv(key, fallback string) string {
-	dir, err := os.Getwd()
-	if err != nil {
-		return fallback
+	for _, path := range configPath {
+		viper.AddConfigPath(path)
 	}
-	err = godotenv.Load(filepath.Join(dir, "config", "config.env"))
-	if err != nil {
-		log.Println(err)
-		return fallback
 
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("could not read config file:%v", err)
 	}
-	return os.Getenv(key)
+
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
+		log.Fatalf("could not unmarshal config:%v", err)
+	}
+
+	return config
+
 }
