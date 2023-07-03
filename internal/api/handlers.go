@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type productRequest struct {
+type ProductRequest struct {
 	Name  string `json:"productName"`
 	Brand string `json:"brandName"`
 }
@@ -18,7 +18,7 @@ func (app *Application) handlerGetProduct(ctx *fiber.Ctx) error {
 }
 func (app *Application) handlerPostProduct(ctx *fiber.Ctx) error {
 
-	tempProduct := &productRequest{}
+	tempProduct := &ProductRequest{}
 	err := pkg.DecodeJSONBody(ctx, tempProduct)
 	if err != nil {
 		return err

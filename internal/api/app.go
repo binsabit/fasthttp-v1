@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/binsabit/fasthttp-v1/config"
+	"github.com/binsabit/fasthttp-v1/internal/config"
 	"github.com/binsabit/fasthttp-v1/internal/data/postgesql"
 	"github.com/binsabit/fasthttp-v1/pkg"
 	"github.com/gofiber/fiber/v2"
@@ -31,17 +31,17 @@ func NewAplication(serverPort string, infolog, errorlog *log.Logger) *Applicatio
 }
 
 func Run() {
-	cfg := config.Configure()
+	cfg := config.MustLoad()
 
 	infoLog := pkg.NewLogger(cfg.LogFile, "INFO")
 	errorLog := pkg.NewLogger(cfg.LogFile, "ERROR")
 
-	pool, err := postgesql.NewPGXPool(context.Background(), cfg.DB)
+	pool, err := postgesql.NewPGXPool(context.Background(), cfg.Storage)
 	if err != nil {
 		errorLog.Fatalf("could not establish db connetion pool: %v", err)
 	}
 	defer pool.Close()
-	app := NewAplication(cfg.Port, infoLog, errorLog)
+	app := NewAplication(cfg.HTTPServer.Address, infoLog, errorLog)
 
 	app.router.Use(cors.New())
 	app.setupRoutes()

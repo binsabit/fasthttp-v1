@@ -1,3 +1,7 @@
-port: "8080"
-db: postgres://yerdaulet:pa55word@localhost:5432/prosclad"
+env: "local" 
+storage: postgres://yerdaulet:pa55word@localhost:5432/prosclad"
 logfile: "./log/log.txt"
+http: 
+  address: "8080"
+  timeout: 5s
+  idle: 15s
