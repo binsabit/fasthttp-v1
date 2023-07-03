@@ -1,5 +1,14 @@
 env: "local" 
-storage: postgres://yerdaulet:pa55word@localhost:5432/prosclad/111"
+storage: 
+  user: yerdaulet 
+  password: pa55word 
+  host: localhost 
+  port: "5432"
+  dbname: prosclad 
+  sslmode: disable 
+  pool_max_conns: 10
+  pool_min_conns: 2
+  pool_max_conn_idle_time: "15m"
 logfile: "./log/log.txt"
 http: 
   address: "8080"
