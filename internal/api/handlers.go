@@ -13,7 +13,7 @@ type ProductRequest struct {
 }
 
 func (app *Application) handlerGetProduct(ctx *fiber.Ctx) error {
-	log.Println("hello from GetProduct")
+	app.Logger.Info("hello from GetProduct")
 	return nil
 }
 func (app *Application) handlerPostProduct(ctx *fiber.Ctx) error {

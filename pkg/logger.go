@@ -3,14 +3,25 @@ package pkg
 import (
 	"log"
 	"os"
+
+	"golang.org/x/exp/slog"
 )
 
-func NewLogger(filepath, prefix string) *log.Logger {
+func NewLogger(filepath string) *slog.Logger {
+	if filepath == "" {
+		textHandler := slog.NewTextHandler(os.Stdout, nil)
+		logger := slog.New(textHandler)
+		return logger
+	}
+
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("could not init log file:%v", err)
 	}
-	logger := log.New(file, prefix+":\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// defer file.Close()
 
+	textHandler := slog.NewTextHandler(file, nil)
+	logger := slog.New(textHandler)
 	return logger
+
 }

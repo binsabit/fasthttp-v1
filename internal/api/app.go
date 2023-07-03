@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/binsabit/fasthttp-v1/internal/config"
@@ -10,6 +9,7 @@ import (
 	"github.com/binsabit/fasthttp-v1/pkg"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"golang.org/x/exp/slog"
 )
 
 var forceShutdownTime = time.Second * 15
@@ -17,31 +17,29 @@ var forceShutdownTime = time.Second * 15
 type Application struct {
 	serverPort string
 	router     *fiber.App
-	InfoLog    *log.Logger
-	ErrorLog   *log.Logger
+	Logger     *slog.Logger
 }
 
-func NewAplication(serverPort string, infolog, errorlog *log.Logger) *Application {
+func NewAplication(serverPort string, logger *slog.Logger) *Application {
 	return &Application{
 		serverPort: serverPort,
 		router:     fiber.New(),
-		InfoLog:    infolog,
-		ErrorLog:   errorlog,
+		Logger:     logger,
 	}
 }
 
 func Run() {
 	cfg := config.MustLoad()
-
-	infoLog := pkg.NewLogger(cfg.LogFile, "INFO")
-	errorLog := pkg.NewLogger(cfg.LogFile, "ERROR")
-
+	logger := pkg.NewLogger(cfg.LogFile)
+	logger.Info(cfg.LogFile)
 	pool, err := postgesql.NewPGXPool(context.Background(), cfg.Storage)
 	if err != nil {
-		errorLog.Fatalf("could not establish db connetion pool: %v", err)
+		logger.Error("could not establish db connetion pool: %v", err)
+		return
 	}
 	defer pool.Close()
-	app := NewAplication(cfg.HTTPServer.Address, infoLog, errorLog)
+
+	app := NewAplication(cfg.HTTPServer.Address, logger)
 
 	app.router.Use(cors.New())
 	app.setupRoutes()
