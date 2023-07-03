@@ -1,5 +1,5 @@
 env: "local" 
-storage: postgres://yerdaulet:pa55word@localhost:5432/prosclad"
+storage: postgres://yerdaulet:pa55word@localhost:5432/prosclad/111"
 logfile: "./log/log.txt"
 http: 
   address: "8080"
