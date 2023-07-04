@@ -10,14 +10,51 @@ import (
 )
 
 type Config struct {
-	Env        string `mapstructure:"env"`
-	Storage    string `mapstructure:"storage"`
-	LogFile    string `mapstructure:"logfile"`
-	HTTPServer struct {
-		Address      string        `mapstructure:"address"`
-		Timeout      time.Duration `mapstructure:"timeout"`
-		Idle_timeout time.Duration `mapstructure:"time"`
-	} `mapstructure:"http"`
+	Env         string      `mapstructure:"env"`
+	LogFile     string      `mapstructure:"logfile"`
+	Storage     Storage     `mapstructure:"storage"`
+	HTTPServer  HTTPServer  `mapstructure:"http"`
+	RateLimiter RateLimiter `mapstructure:"ratelimtier"`
+}
+type HTTPServer struct {
+	Address      string        `mapstructure:"address"`
+	Timeout      time.Duration `mapstructure:"timeout"`
+	Idle_timeout time.Duration `mapstructure:"time"`
+}
+
+type Storage struct {
+	User                string `mapstructure:"user"`
+	Password            string `mapstructure:"password"`
+	Host                string `mapstructure:"host"`
+	Port                string `mapstructure:"port"`
+	DBName              string `mapstructure:"dbname"`
+	SSLMode             string `mapstructure:"sslmode"`
+	PoolMaxConns        int    `mapstructure:"pool_max_conns"`
+	PoolMinConns        int    `mapstructure:"pool_min_conns"`
+	PoolMaxConnIdleTime string `mapstructure:"pool_max_conn_idle_time"`
+}
+
+type SecurityHeaders struct {
+	HSTSMaxAge                int
+	HSTSExcludeSubdomains     bool
+	HSTSPreload               bool
+	ContentSecurityPolicy     string
+	XSSProtection             string
+	ContentTypeNosniff        string
+	XFrameOptions             string
+	ReferrerPolicy            string
+	CrossOriginEmbedderPolicy string
+	CrossOriginOpenerPolicy   string
+	CrossOriginResourcePolicy string
+	OriginAgentCluster        string
+	XDNSPrefetchControl       string
+	XDownloadOptions          string
+	XPermittedCrossDomain     string
+}
+
+type RateLimiter struct {
+	MaxReq     int           `mapstructure:"maxreq"`
+	Expiration time.Duration `mapstructure:"expiration"`
 }
 
 func MustLoad() *Config {
