@@ -16,6 +16,7 @@ type Config struct {
 	HTTPServer  HTTPServer  `mapstructure:"http"`
 	RateLimiter RateLimiter `mapstructure:"ratelimtier"`
 }
+
 type HTTPServer struct {
 	Address      string        `mapstructure:"address"`
 	Timeout      time.Duration `mapstructure:"timeout"`

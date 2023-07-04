@@ -1,3 +1,4 @@
+version: "1.0.0"
 env: "local" 
 storage: 
   user: yerdaulet 
@@ -14,3 +15,6 @@ http:
   address: "8080"
   timeout: 5s
   idle: 15s
+ratelimiter:
+  maxreq: 20
+  exp: 5s
