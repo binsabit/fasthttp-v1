@@ -20,20 +20,6 @@ import (
 
 var forceShutdownTime = time.Second * 15
 
-type Application struct {
-	ServerPort string
-	Router     *fiber.App
-	Logger     *slog.Logger
-}
-
-func NewAplication(serverPort string, logger *slog.Logger) *Application {
-	return &Application{
-		ServerPort: serverPort,
-		Router:     fiber.New(),
-		Logger:     logger,
-	}
-}
-
 func StartApp() {
 	cfg := config.MustLoad()
 	logger := sl.NewLogger(cfg.LogFile)
@@ -43,23 +29,22 @@ func StartApp() {
 		return
 	}
 	defer pool.Close()
+	app := fiber.New()
 
-	app := NewAplication(cfg.HTTPServer.Address, logger)
-	app.RegisterMidlewares(logger, cfg.RateLimiter)
+	RegisterMidlewares(app, logger, cfg.RateLimiter)
 
-	routes.SetupProductRoutes(app.Router)
+	routes.SetupProductRoutes(app)
 
-	app.Router.Listen(":" + app.ServerPort)
+	app.Listen(":" + cfg.HTTPServer.Address)
 }
 
-func (app *Application) RegisterMidlewares(logger *slog.Logger, cfg config.RateLimiter) {
-	app.Router.Use(helmet.New())
-	app.Router.Use(recover.New())
-	app.Router.Use(cors.New())
-	app.Router.Use(compress.New(compress.Config{
+func RegisterMidlewares(app *fiber.App, logger *slog.Logger, cfg config.RateLimiter) {
+	app.Use(helmet.New())
+	app.Use(recover.New())
+	app.Use(cors.New())
+	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
 	}))
-	app.Router.Use(limiter.New(middlewares.NewRateLimiter(cfg)))
-	app.Router.Use(middlewares.NewFiberLogger(logger))
-
+	app.Use(limiter.New(middlewares.NewRateLimiter(cfg)))
+	app.Use(middlewares.NewFiberLogger(logger))
 }
