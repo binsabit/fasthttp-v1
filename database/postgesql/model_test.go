@@ -6,7 +6,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/binsabit/fasthttp-v1/internal/config"
+	"github.com/binsabit/fasthttp-v1/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 )

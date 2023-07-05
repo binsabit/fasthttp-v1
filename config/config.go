@@ -14,7 +14,7 @@ type Config struct {
 	LogFile     string      `mapstructure:"logfile"`
 	Storage     Storage     `mapstructure:"storage"`
 	HTTPServer  HTTPServer  `mapstructure:"http"`
-	RateLimiter RateLimiter `mapstructure:"ratelimtier"`
+	RateLimiter RateLimiter `mapstructure:"ratelimiter"`
 }
 
 type HTTPServer struct {
@@ -35,6 +35,11 @@ type Storage struct {
 	PoolMaxConnIdleTime string `mapstructure:"pool_max_conn_idle_time"`
 }
 
+type RateLimiter struct {
+	MaxReq     int           `mapstructure:"maxreq"`
+	Expiration time.Duration `mapstructure:"expiration"`
+}
+
 type SecurityHeaders struct {
 	HSTSMaxAge                int
 	HSTSExcludeSubdomains     bool
@@ -53,13 +58,8 @@ type SecurityHeaders struct {
 	XPermittedCrossDomain     string
 }
 
-type RateLimiter struct {
-	MaxReq     int           `mapstructure:"maxreq"`
-	Expiration time.Duration `mapstructure:"expiration"`
-}
-
 func MustLoad() *Config {
-	configPath := flag.String("config", "./config/config.yaml", "path to configure the project")
+	configPath := flag.String("config", "./config.yaml", "path to configure the project")
 	flag.Parse()
 	if *configPath == "" {
 		log.Fatal("could not get config path")

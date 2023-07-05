@@ -13,8 +13,8 @@ storage:
 logfile: "./log/log.txt"
 http: 
   address: "8080"
-  timeout: 5s
-  idle: 15s
+  timeout: "5s"
+  idle: "15s"
 ratelimiter:
   maxreq: 20
-  exp: 5s
+  expiration: "30s"

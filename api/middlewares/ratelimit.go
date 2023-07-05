@@ -1,9 +1,10 @@
 package middlewares
 
 import (
+	"log"
 	"time"
 
-	"github.com/binsabit/fasthttp-v1/internal/config"
+	"github.com/binsabit/fasthttp-v1/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
@@ -18,7 +19,7 @@ type LimiterConfig struct {
 }
 
 func KeyGenerator(ctx *fiber.Ctx) string {
-	return ctx.IP()
+	return ctx.Get("x-forwarded-for")
 }
 
 func LimitHandler(ctx *fiber.Ctx) error {
@@ -26,11 +27,12 @@ func LimitHandler(ctx *fiber.Ctx) error {
 }
 
 func NewRateLimiter(cfg config.RateLimiter) limiter.Config {
-
+	log.Println(cfg)
 	return limiter.Config{
-		Max:          cfg.MaxReq,
-		Expiration:   cfg.Expiration,
-		KeyGenerator: KeyGenerator,
-		LimitReached: LimitHandler,
+		Max:               cfg.MaxReq,
+		Expiration:        cfg.Expiration,
+		KeyGenerator:      KeyGenerator,
+		LimiterMiddleware: limiter.SlidingWindow{},
+		LimitReached:      LimitHandler,
 	}
 }

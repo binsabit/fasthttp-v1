@@ -1,13 +1,14 @@
-package api
+package app
 
 import (
 	"context"
 	"time"
 
-	"github.com/binsabit/fasthttp-v1/internal/api/middlewares"
-	"github.com/binsabit/fasthttp-v1/internal/config"
-	"github.com/binsabit/fasthttp-v1/internal/data/postgesql"
-	"github.com/binsabit/fasthttp-v1/internal/lib/logger/sl"
+	"github.com/binsabit/fasthttp-v1/api/middlewares"
+	"github.com/binsabit/fasthttp-v1/api/routes"
+	"github.com/binsabit/fasthttp-v1/config"
+	"github.com/binsabit/fasthttp-v1/database/postgesql"
+	"github.com/binsabit/fasthttp-v1/lib/logger/sl"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -44,20 +45,20 @@ func StartApp() {
 	defer pool.Close()
 
 	app := NewAplication(cfg.HTTPServer.Address, logger)
-	app.SetMidlewares(logger, cfg.RateLimiter)
-	app.SetupRoutes()
+	app.RegisterMidlewares(logger, cfg.RateLimiter)
+
+	routes.SetupProductRoutes(app.Router)
 
 	app.Router.Listen(":" + app.ServerPort)
 }
 
-func (app *Application) SetMidlewares(logger *slog.Logger, cfg config.RateLimiter) {
+func (app *Application) RegisterMidlewares(logger *slog.Logger, cfg config.RateLimiter) {
 	app.Router.Use(helmet.New())
 	app.Router.Use(recover.New())
 	app.Router.Use(cors.New())
 	app.Router.Use(compress.New(compress.Config{
-		Level: compress.LevelBestSpeed, // 1
+		Level: compress.LevelBestSpeed,
 	}))
-	app.Router.Use(middlewares.SecurityHeaders)
 	app.Router.Use(limiter.New(middlewares.NewRateLimiter(cfg)))
 	app.Router.Use(middlewares.NewFiberLogger(logger))
 
