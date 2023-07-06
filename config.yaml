@@ -1,15 +1,12 @@
 version: "1.0.0"
 env: "local" 
 storage: 
-  user: yerdaulet 
-  password: pa55word 
-  host: localhost 
-  port: "5432"
-  dbname: prosclad 
-  sslmode: disable 
-  pool_max_conns: 10
-  pool_min_conns: 2
-  pool_max_conn_idle_time: "15m"
+  db_driver: "pgx"
+  dsn : "postgres://yerdaulet:pa55word@localhost:5432/prosclad?sslmode=disable"
+  max_open_conns: 10
+  max_idle_conns: 2
+  max_idle_time: "5s"
+  max_life_time: "30s"
 logfile: "./log/log.txt"
 http: 
   address: "8080"

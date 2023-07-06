@@ -24,15 +24,12 @@ type HTTPServer struct {
 }
 
 type Storage struct {
-	User                string `mapstructure:"user"`
-	Password            string `mapstructure:"password"`
-	Host                string `mapstructure:"host"`
-	Port                string `mapstructure:"port"`
-	DBName              string `mapstructure:"dbname"`
-	SSLMode             string `mapstructure:"sslmode"`
-	PoolMaxConns        int    `mapstructure:"pool_max_conns"`
-	PoolMinConns        int    `mapstructure:"pool_min_conns"`
-	PoolMaxConnIdleTime string `mapstructure:"pool_max_conn_idle_time"`
+	DBDriver     string        `mapstructure:"db_driver"`
+	DSN          string        `mapstructure:"dsn"`
+	MaxOpenConns int           `mapstructure:"max_open_conns"`
+	MaxIdleConns int           `mapstructure:"max_idle_conns"`
+	MaxIdleTime  time.Duration `mapstructure:"max_idle_time"`
+	MaxConnLife  time.Duration `mapstructure:"max_life_time"`
 }
 
 type RateLimiter struct {
