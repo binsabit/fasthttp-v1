@@ -1,13 +1,12 @@
 package app
 
 import (
-	"context"
 	"time"
 
 	"github.com/binsabit/fasthttp-v1/api/middlewares"
 	"github.com/binsabit/fasthttp-v1/api/routes"
 	"github.com/binsabit/fasthttp-v1/config"
-	"github.com/binsabit/fasthttp-v1/database/postgesql"
+	"github.com/binsabit/fasthttp-v1/database"
 	"github.com/binsabit/fasthttp-v1/lib/logger/sl"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -23,12 +22,16 @@ var forceShutdownTime = time.Second * 15
 func StartApp() {
 	cfg := config.MustLoad()
 	logger := sl.NewLogger(cfg.LogFile)
-	pool, err := postgesql.NewPGXPool(context.Background(), cfg.Storage)
-	if err != nil {
-		logger.Error("could not establish db connetion pool", sl.Err(err))
-		return
-	}
-	defer pool.Close()
+	// pool, err := postgesql.NewPGXPool(context.Background(), cfg.Storage)
+	// if err != nil {
+	// 	logger.Error("could not establish db connetion pool", sl.Err(err))
+	// 	return
+	// }
+	// defer pool.Close()
+	db := database.ConnectToDB(cfg.Storage)
+
+	defer db.Close()
+
 	app := fiber.New()
 
 	RegisterMidlewares(app, logger, cfg.RateLimiter)
